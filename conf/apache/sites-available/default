@@ -1,7 +1,7 @@
 <VirtualHost *:80>
         ServerAdmin webmaster@localhost
 
-        DocumentRoot /datacube/web
+        DocumentRoot /vagrant/project
         DirectoryIndex index.php index.html index.shtml
 
         <Directory />
@@ -9,7 +9,7 @@
                 AllowOverride All
         </Directory>
 
-        <Directory /datacube/web>
+        <Directory /vagrant/project>
                 Options Indexes FollowSymLinks MultiViews
                 AllowOverride All
                 Order allow,deny
