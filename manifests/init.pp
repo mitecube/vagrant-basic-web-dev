@@ -23,7 +23,7 @@ class development {
 
 }
 
-class datacube_php {
+class php_dev {
 
     php::module { [
         'curl', 'gd', 'mcrypt', 'memcached', 'mysql',
@@ -74,32 +74,21 @@ class datacube_php {
         notify => Service['apache'],
     }    
     
-#  	file { "/etc/mysql/my.cnf":
-#      mode => 644, owner => root, group => root,
-#      source  => '/vagrant/conf/mysql/my.cnf'
-#  }    
-
 }
 
 class { "mysql":
   root_password => 'root',          
   source  => '/vagrant/conf/mysql/my.cnf'
 }
-mysql::grant { 'datacube':
-  mysql_privileges => 'ALL',
-  mysql_password => 'datacube',
-  mysql_db => 'datacube',
-  mysql_user => 'datacube',
-  mysql_host => '%',
-}
 
-user { "datacube":
-	ensure => "present",
-}
-file { '/datacube':
-   ensure => 'link',
-   target => '/vagrant/project',
-}
+#mysql::grant { 'dbname':
+#  mysql_privileges => 'ALL',
+#  mysql_db => 'dbname',
+#  mysql_user => 'dbuser',
+#  mysql_password => 'dbpass',
+#  mysql_host => '%',
+#}
+
 
 file { "/var/log/mongo":
     ensure => "directory",
@@ -108,70 +97,12 @@ file { "/var/lib/mongo":
     ensure => "directory",
 }
 
-class { "redis": 
-	source  => '/vagrant/conf/redis/redis.conf'
-}
+#class { "redis": 
+#	source  => '/vagrant/conf/redis/redis.conf'
+#}
 
-class { 'gearman': }
+#class { 'gearman': }
 
-supervisor::service {
-  'MitecubeDatacubeBundleWorkerCrawlerManagerWorker':
-    ensure      => present,
-    enable      => true,
-    command     => '/usr/bin/php /vagrant/project/app/console gearman:worker:execute MitecubeDatacubeBundleWorkerCrawlerManagerWorker --no-interaction',
-    environment => '',
-    numprocs 	=> '2',
-    autorestart	=> true,
-    user        => 'datacube',
-    group       => 'datacube',
-    require     => [ Package['gearman-job-server'], User['datacube'] ];
-
-  'MitecubeDatacubeBundleWorkerCrawlerDependentWorker':
-    ensure      => present,
-    enable      => true,
-    command     => '/usr/bin/php /vagrant/project/app/console gearman:worker:execute MitecubeDatacubeBundleWorkerCrawlerDependentWorker --no-interaction',
-    environment => '',
-    numprocs 	=> '10',
-    autorestart	=> true,    
-    user        => 'datacube',
-    group       => 'datacube',
-    require     => [ Package['gearman-job-server'], User['datacube'] ];
-    
-
-  'MitecubeDatacubeBundleWorkerManagerWorker':
-    ensure      => present,
-    enable      => true,
-    command     => '/usr/bin/php /vagrant/project/app/console gearman:worker:execute MitecubeDatacubeBundleWorkerManagerWorker --no-interaction',
-    environment => '',
-    numprocs 	=> '2',
-    autorestart	=> true,
-    user        => 'datacube',
-    group       => 'datacube',
-    require     => [ Package['gearman-job-server'], User['datacube'] ];
-
-  'MitecubeDatacubeBundleWorkerEtlCustomCodeWorker':
-    ensure      => present,
-    enable      => true,
-    command     => '/usr/bin/php /vagrant/project/app/console gearman:worker:execute MitecubeDatacubeBundleWorkerEtlCustomCodeWorker --no-interaction',
-    environment => '',
-    numprocs 	=> '10',
-    autorestart	=> true,    
-    user        => 'datacube',
-    group       => 'datacube',
-    require     => [ Package['gearman-job-server'], User['datacube'] ];
-    
-
-  'MitecubeQueueBundleWorkerTestWorker':
-    ensure      => present,
-    enable      => true,
-    command     => '/usr/bin/php /vagrant/project/app/console gearman:worker:execute MitecubeQueueBundleWorkerTestWorker --no-interaction',
-    environment => '',
-    numprocs 	=> '1',
-    autorestart	=> true,    
-    user        => 'datacube',
-    group       => 'datacube',
-    require     => [ Package['gearman-job-server'], User['datacube'] ];    
-}
 
 class { 'elasticsearch':
   version      => '0.20.4',
@@ -192,7 +123,7 @@ include php::apache2
 include apache
 include redis
 
-include datacube_php
+include php_dev
 include development
 
 include mysql
@@ -201,6 +132,6 @@ class {'mongodb':
   enable_10gen => true,
 }
 
-include supervisor
+#include supervisor
 
 #include phpqatools
