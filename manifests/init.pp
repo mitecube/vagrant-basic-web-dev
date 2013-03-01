@@ -105,7 +105,7 @@ file { "/var/lib/mongo":
 
 
 class { 'elasticsearch':
-  version      => '0.20.4',
+  version      => '0.20.5',
   java_package => 'openjdk-7-jre-headless',
   dbdir        => '/var/lib/elasticsearch',
   logdir       => '/var/log/elasticsearch',
